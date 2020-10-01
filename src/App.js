@@ -1,26 +1,85 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Note from './Note';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+ class DisplayAllNotes extends React.Component {
+   constructor(props) {
+     super(props);
+     this.state = {
+       notes: [],
+     };
+   }
+   nextId = () => {
+     this.uniqueId = this.uniqueId || 0;
+     return this.uniqueId++;
+   };
 
-export default App;
+   currenttime = ()=>{
+     var today = new Date();
+     var time =today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+     return time;
+   }
+   add = (text) => {
+     var notes = [
+       ...this.state.notes,
+       {
+         id: this.nextId(),
+         note: text,
+         time:this.currenttime(),
+       },
+     ];
+     this.setState({ notes });
+   };
+
+   update = (newText, id) => {
+     var notes = this.state.notes.map((note) =>
+       note.id !== id
+         ? note
+         : {
+             ...note,
+             note: newText,
+           }
+     );
+     this.setState({ notes });
+   };
+
+   remove = (id) => {
+     var notes = this.state.notes.filter((note) => note.id !== id);
+     this.setState({ notes });
+   };
+
+   eachNote = (note) => {
+     return (
+       console.log(note),
+       (
+         <Note
+           key={note.id}
+           id={note.id}
+           onChange={this.update}
+           onRemove={this.remove}
+           note={note.note}
+           time={note.time}
+         ></Note>
+       )
+     );
+   };
+
+   render() {
+     return (
+       <div className="board">
+         {this.state.notes.map(this.eachNote)}
+         <button
+           className="button1"
+           style={{verticalAlign:"middle"}}
+           onClick={() => this.add()}
+         >
+           Add a Note
+         </button>
+       </div>
+     );
+   }
+ }
+
+ 
+
+export default DisplayAllNotes;
